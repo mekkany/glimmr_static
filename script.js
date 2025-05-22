@@ -1,5 +1,10 @@
 async function generateImage() {
-  const prompt = document.getElementById("prompt").value;
+  const prompt = document.getElementById("promptInput").value;
+  if (!prompt) {
+    alert("Please enter a prompt.");
+    return;
+  }
+  alert("Pretending to generate image for: " + prompt);
   const style = document.getElementById("style").value;
   const finalPrompt = `${prompt}, style: ${style}, ultra realistic, 8K, first-person, GoPro`;
 
