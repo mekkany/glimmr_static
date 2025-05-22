@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glimmr - Free AI Image Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>✨ Glimmr</h1>
+    <p>Create stunning AI images. Free & unlimited.</p>
+    <a class="donate" href="https://ko-fi.com/mohammad_art" target="_blank">☕ Support on Ko-fi</a>
+  </header>
+  <main>
+    <textarea id="prompt" placeholder="Describe your image..."></textarea>
+    <select id="style">
+      <option value="realistic">Realistic</option>
+      <option value="first-person">First-Person POV</option>
+      <option value="gopro">GoPro Style</option>
+      <option value="anime">Anime</option>
+      <option value="fantasy">Fantasy</option>
+    </select>
+    <button onclick="generateImage()">Generate</button>
+    <div id="result"></div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
