@@ -1,56 +1,45 @@
+// /api/generate.js
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Only POST requests allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { prompt } = req.body;
 
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required" });
+  }
+
+  const replicateApiToken = process.env.REPLICATE_API_TOKEN;
+
+  if (!replicateApiToken) {
+    return res.status(500).json({ error: "Replicate API token not set" });
+  }
+
   try {
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
-      method: 'POST',
+    const response = await fetch("https://api.replicate.com/v1/predictions", {
+      method: "POST",
       headers: {
-        'Authorization': `Token ${process.env.REPLICATE_API_TOKEN}`,
-        'Content-Type': 'application/json'
+        "Authorization": `Token ${replicateApiToken}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        version: "db21e45a02a8c168e6c5d54a0986f4c4df9c6c4b1b4c7e3edbe7d3f8d82c6e02", // Stable Diffusion XL
-        input: { prompt }
+        version: "YOUR_MODEL_VERSION", // REPLACE THIS
+        input: {
+          prompt: prompt
+        }
       })
     });
 
-    const prediction = await response.json();
+    const data = await response.json();
 
-    if (prediction && prediction.urls && prediction.urls.get) {
-      // Poll until image is ready
-      let image = null;
-      for (let i = 0; i < 10; i++) {
-        const resultRes = await fetch(prediction.urls.get, {
-          headers: {
-            'Authorization': `Token ${process.env.REPLICATE_API_TOKEN}`
-          }
-        });
-        const result = await resultRes.json();
-
-        if (result.status === 'succeeded') {
-          image = result.output[result.output.length - 1];
-          break;
-        } else {
-          await new Promise(resolve => setTimeout(resolve, 1500));
-        }
-      }
-
-      if (image) {
-        return res.status(200).json({ image });
-      } else {
-        return res.status(500).json({ message: 'Image generation timeout' });
-      }
-    } else {
-      return res.status(500).json({ message: 'Prediction failed' });
+    if (data.error) {
+      return res.status(500).json({ error: data.error });
     }
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'API request failed' });
+    res.status(200).json({ image: data.output });
+  } catch (error) {
+    console.error("API Error:", error);
+    res.status(500).json({ error: "Something went wrong" });
   }
 }
-
